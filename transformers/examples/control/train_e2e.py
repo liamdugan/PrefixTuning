@@ -164,17 +164,20 @@ if __name__ == '__main__':
 
     elif args.mode == 'webnlg':
         # 2017 Challeng Version.
-        TRAIN_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/webnlg_challenge_2017/train.json"
-        TEST_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/webnlg_challenge_2017/dev.json"
+        #TRAIN_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/webnlg_challenge_2017/train.json"
+        #TEST_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/webnlg_challenge_2017/dev.json"
 
         # v2
-        # TRAIN_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/release_v2/json/webnlg_release_v2_train.json"
-        # TEST_FILE =  "/u/scr/xlisali/WebNLG/webnlg-dataset/release_v2/json/webnlg_release_v2_dev.json"
+        TRAIN_FILE = "/home/liamdugan19/webnlg_release_v2_train.json"
+        TEST_FILE = "/home/liamdugan19/webnlg_release_v2_dev.json"
+        
+        #TRAIN_FILE = "/u/scr/xlisali/WebNLG/webnlg-dataset/release_v2/json/webnlg_release_v2_train.json"
+        #TEST_FILE =  "/u/scr/xlisali/WebNLG/webnlg-dataset/release_v2/json/webnlg_release_v2_dev.json"
         folder_name = "webnlg_models/"
 
     elif args.mode == 'writingPrompts':
-        TRAIN_FILE = "/juice/u/xlisali/WritingPrompts/writingPrompts/train_small.txt"
-        TEST_FILE = "/juice/u/xlisali/WritingPrompts/writingPrompts/valid_small.txt"
+        TRAIN_FILE = "/home/liamdugan19/writingPrompts/train_daphne_small.txt"
+        TEST_FILE = "/home/liamdugan19/writingPrompts/dev_daphne_small.txt"
         folder_name = "wp_models/"
 
     elif args.mode == 'cnndm':
@@ -290,7 +293,7 @@ if __name__ == '__main__':
         app += '--evaluate_during_training --eval_steps 5000 '
 
     if OLD_MODEL == 'gpt2-large':
-        app += ' --cache_dir /u/scr/xlisali/contrast_LM/transformers/examples/control/gpt2-large-s3 '
+        app += ' --cache_dir /home/liamdugan19/PrefixTuning/transformers/examples/control/gpt2-large-s3 '
 
     if args.tuning_mode == 'finetune-top':
         app += ' --top_layers {} '.format(args.top_layers)

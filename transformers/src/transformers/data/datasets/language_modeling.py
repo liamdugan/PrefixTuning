@@ -476,15 +476,17 @@ class LineByLineWritingPromptsTextDataset(Dataset):
         src_lines = list(src_lines)
         tgt_lines = list(tgt_lines)
 
-        for i, x in enumerate(src_lines):
-            src_lines[i] = x.replace("-lrb-", "(")
-            src_lines[i] = x.replace("-rrb-", ")")
+#        for i, x in enumerate(src_lines):
+#            src_lines[i] = x.replace("-lrb-", "(")
+#            src_lines[i] = x.replace("-rrb-", ")")
 
-
-        tgt_lines = [x.replace("<newline>", "\n") for x in tgt_lines]
+#        tgt_lines = [x.replace("<newline>", "\n") for x in tgt_lines]
 
         edited_sents = []
         for src, tgt in zip(src_lines, tgt_lines):
+            if len(tokenizer(src)['input_ids']) > 900:
+                print("oof too long")
+                continue
             sent = ' {} {} '.format(src, bos_tok) + tgt + ' {}'.format(eos_tok)
             edited_sents.append(sent)
 
@@ -492,17 +494,14 @@ class LineByLineWritingPromptsTextDataset(Dataset):
         # batch_encoding = tokenizer(edited_sents, add_special_tokens=True, truncation=True, max_length=block_size,
         #                            is_split_into_words=False)
         if True:
-            batch_encoding = tokenizer(edited_sents, add_special_tokens=True, truncation=False,
+            batch_encoding = tokenizer(edited_sents, add_special_tokens=True, truncation=True, max_length=1019,
                                        is_split_into_words=False)
         else:
             batch_encoding = tokenizer(edited_sents, add_special_tokens=True, truncation=True, max_length=block_size,
                                                                   is_split_into_words=False)
 
         self.examples = batch_encoding["input_ids"]
-
         self.labels = copy.deepcopy(self.examples)
-
-
 
         self.src_sent = []
         self.tgt_sent = []

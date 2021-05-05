@@ -9,7 +9,7 @@ if __name__ == '__main__':
     old_model = None
     MODEL_FILE = sys.argv[4]
     submit_job = (sys.argv[5] == 'yes')
-
+    print("HEY1")
     if mode == 'embMatch' and not use_prefixtuning:
         MODEL_FILE="/u/scr/xlisali/contrast_LM/transformers/examples/language-modeling/temp_medium_matching_cleanbert"
         Token_FILE="/u/scr/xlisali/contrast_LM/transformers/examples/language-modeling/temp_medium_matching_cleanbert"
@@ -327,7 +327,9 @@ if __name__ == '__main__':
         #     OLD_MODEL="gpt2-medium"
 
     elif mode == 'writingPrompts' or mode == 'sentiment' or mode == 'topic':
+        print("HEY- Im here")
         Token_FILE = MODEL_FILE
+        print(Token_FILE)
         if mode == 'writingPrompts':
             gen_dir = 'wp_results'
         else:
@@ -589,7 +591,7 @@ if __name__ == '__main__':
 
 
 
-    COMMANDLINE = "python /juice/scr/xlisali/contrast_LM/transformers/examples/text-generation/run_generation.py \
+    COMMANDLINE = "python run_generation.py \
         --model_type=gpt2 \
         --length 100 \
         --model_name_or_path={} \

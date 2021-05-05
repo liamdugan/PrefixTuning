@@ -24,6 +24,7 @@ import logging
 import numpy as np
 import torch
 import json
+from datetime import date
 
 from transformers import (
     CTRLLMHeadModel,
@@ -44,7 +45,7 @@ from transformers import (
     GPT2LMHeadModelAdapter,
 )
 import sys, os
-sys.path.insert(1, '/u/scr/xlisali/contrast_LM/transformers/examples/control')
+sys.path.insert(1, '/home/liamdugan19/PrefixTuning/transformers/examples/control')
 from train_control import PrefixTuning, PrefixEmbTuning
 
 
@@ -756,9 +757,10 @@ def main():
             tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name, cache_dir=args.cache_dir)
 
         # TODAYFIX.
+        print(args)
         config._my_arg_tune_mode = args.tuning_mode
         config._my_arg_task_mode = args.task_mode
-        config._objective_mode = args.objective_mode
+        config._objective_mode = 1 #args.objective_mode
         model = model_class.from_pretrained(args.model_name_or_path, config=config, cache_dir=args.cache_dir)
         model.to(args.device)
 
@@ -1250,7 +1252,7 @@ def main():
 
     elif args.task_mode == 'writingPrompts':
         QUICK_CHECK = True
-        test_path = "/juice/u/xlisali/WritingPrompts/writingPrompts/test_small.txt"
+        test_path = "/home/liamdugan19/writingPrompts/dev_daphne_small.txt"
         prompt_text_dict = read_wp_files(test_path, tokenizer)
         args.num_return_sequences = 1
 
@@ -1488,9 +1490,8 @@ def main():
 
 
         # prompt_text = args.prompt if args.prompt else input("Model prompt >>> ")
-
+    generated_sequences = []
     for prompt_idx, prompt_text in enumerate(prompt_text_lst):
-
         # Different models need different input formatting and/or extra arguments
         requires_preprocessing = args.model_type in PREPROCESSING_FUNCTIONS.keys()
         if requires_preprocessing:
@@ -1866,8 +1867,6 @@ def main():
         if len(output_sequences.shape) > 2:
             output_sequences.squeeze_()
 
-        generated_sequences = []
-
         if QUICK_CHECK:
             for generated_sequence_idx, generated_sequence in enumerate(output_sequences):
                 print("=== GENERATED SEQUENCE {} ===".format(generated_sequence_idx + 1))
@@ -1882,10 +1881,13 @@ def main():
 
                 # Add the prompt at the beginning of the sequence. Remove the excess text that was used for pre-processing
                 total_sequence = (
-                    prompt_text + text[len(tokenizer.decode(encoded_prompt[0], clean_up_tokenization_spaces=True)) :]
+                    '=====\nPROMPT: ' + prompt_text + '=====\nGENERATION: ' + text[len(tokenizer.decode(encoded_prompt[0], clean_up_tokenization_spaces=True)) :]
                 )
 
-                generated_sequences.append(total_sequence)
+                prompt = prompt_text
+                generation = text[len(tokenizer.decode(encoded_prompt[0], clean_up_tokenization_spaces=True)):]
+
+                generated_sequences.append({'prompt': prompt, 'generation': generation})
                 print(total_sequence)
         else:
             for generated_sequence_idx, generated_sequence in enumerate(output_sequences):
@@ -1929,6 +1931,16 @@ def main():
 
     # return generated_sequences
 
+    # Save the prompts to the json file
+    to_save = {
+      'date-generated': date.today().strftime("%d/%m/%Y"),
+      'generation-model': 'prefix-tuning',
+      'dataset': 'writingPrompts',
+      'generations': generated_sequences
+    }
+    with open('/home/liamdugan19/writingPrompts/outputs.txt', 'w') as f:
+        json.dump(to_save, f, indent=2)
+
     if not QUICK_CHECK:
         out_handle.close()
 
@@ -1945,21 +1957,22 @@ def main():
         os.system("bash /u/scr/xlisali/DART/dart/evaluation/run_eval_on_webnlg.sh "
                   "{} {} >> {}".format(curr_dir, tagging, out_file_eval))
 
+    return
 
-    elif 'classify' in curr_dir:
-        print(curr_dir)
-        print(gold_dir)
-        temp_command = "python /u/scr/xlisali/classify-eval/eval.py {} {}".format(gold_dir, curr_dir)
-        print(temp_command)
-        os.system(temp_command)
+    #elif 'classify' in curr_dir:
+    #    print(curr_dir)
+    #    print(gold_dir)
+    #    temp_command = "python /u/scr/xlisali/classify-eval/eval.py {} {}".format(gold_dir, curr_dir)
+    #    print(temp_command)
+    #    os.system(temp_command)
 
-    if args.task_mode == 'topic' or args.task_mode == 'sentiment':
-        print('view results at ')
-        print(curr_dir)
-
-        temp_command = "python /u/scr/xlisali/attribute-eval/eval.py {} ".format(curr_dir)
-        print(temp_command)
-        os.system(temp_command)
+    #if args.task_mode == 'topic' or args.task_mode == 'sentiment':
+    #    print('view results at ')
+    #    print(curr_dir)
+    #
+    #    temp_command = "python /u/scr/xlisali/attribute-eval/eval.py {} ".format(curr_dir)
+    #    print(temp_command)
+    #    os.system(temp_command)
 
 
 

@@ -727,6 +727,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.emb_match = False
 
         self._objective_mode = config._objective_mode
+        print(self._objective_mode)
         assert self._objective_mode in [0, 1]
         # 0 means the regular token level objective, which is sum / output_len
         # 1 means the sentence level objective, which is sum
